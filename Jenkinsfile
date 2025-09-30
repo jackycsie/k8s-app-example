@@ -1,6 +1,10 @@
 pipeline {
     agent any
     
+    tools {
+        nodejs 'NodeJS-18'
+    }
+    
     environment {
         DOCKER_REGISTRY = 'ghcr.io'
         IMAGE_NAME = "${DOCKER_REGISTRY}/${env.GITHUB_REPOSITORY}"
