@@ -30,6 +30,8 @@ pipeline {
             }
         }
         
+        stage('Build Docker Image') {
+            steps {
                 script {
                     sh '''
                         apt-get update
