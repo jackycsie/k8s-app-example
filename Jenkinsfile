@@ -31,9 +31,6 @@ pipeline {
         }
         
         stage('Build Docker Image') {
-            when {
-                branch 'main'
-            }
             steps {
                 script {
                     def imageTag = "${env.BUILD_NUMBER}-${env.GIT_COMMIT.take(7)}"
@@ -55,9 +52,6 @@ pipeline {
         }
         
         stage('Update GitOps') {
-            when {
-                branch 'main'
-            }
             steps {
                 script {
                     def imageTag = "${env.BUILD_NUMBER}-${env.GIT_COMMIT.take(7)}"
