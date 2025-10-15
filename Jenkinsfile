@@ -54,6 +54,33 @@ pipeline {
                 }
             }
         }
+
+        stage('Update GitOps') {
+            steps {
+                script {
+                    def imageTag = "${env.BUILD_NUMBER}-${env.GIT_COMMIT.take(7)}"
+                    withCredentials([string(credentialsId: 'github-token', variable: 'GIT_TOKEN')]) {
+                        sh """
+                            git config --global user.email "jenkins@example.com"
+                            git config --global user.name "Jenkins CI"
+                            
+                            echo "Cloning GitOps repository..."
+                            git clone https://github.com/jackycsie/k8s-gitops-config.git
+                            cd k8s-gitops-config
+                            
+                            echo "Updating deployment image to ${IMAGE_NAME}:${imageTag}..."
+                            sed -i'' "s|image: .*|image: ${IMAGE_NAME}:${imageTag}|" overlays/production/deployment.yaml
+                            
+                            echo "Committing and pushing to GitOps repo..."
+                            git add .
+                            git commit -m "Update image to ${imageTag}" || true
+                            git push https://jackycsie:${GIT_TOKEN}@github.com/jackycsie/k8s-gitops-config.git
+                        """
+                    }
+                }
+            }
+        }
+
         
     }
     
