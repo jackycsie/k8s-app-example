@@ -7,7 +7,7 @@ pipeline {
     
     environment {
         DOCKER_REGISTRY = 'ghcr.io'
-        IMAGE_NAME = "${DOCKER_REGISTRY}/${env.GITHUB_REPOSITORY}"
+        IMAGE_NAME = 'ghcr.io/jackycsie/k8s-app-example'
         DOCKER_CREDENTIALS = credentials('github-token')
     }
     
@@ -47,7 +47,7 @@ pipeline {
                     
                     // Push to registry
                     sh """
-                        echo ${DOCKER_CREDENTIALS_PSW} | docker login ${DOCKER_REGISTRY} -u ${DOCKER_CREDENTIALS_USR} --password-stdin
+                        echo ${DOCKER_CREDENTIALS} | docker login ${DOCKER_REGISTRY} -u 'jackycsie' --password-stdin
                         docker push ${fullImageName}
                         docker push ${IMAGE_NAME}:latest
                     """
