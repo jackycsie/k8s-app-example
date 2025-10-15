@@ -30,9 +30,11 @@ pipeline {
             }
         }
         
-        stage('Build Docker Image') {
-            steps {
                 script {
+                    sh '''
+                        apt-get update
+                        apt-get install -y docker.io
+                    '''
                     def imageTag = "${env.BUILD_NUMBER}-${env.GIT_COMMIT.take(7)}"
                     def fullImageName = "${IMAGE_NAME}:${imageTag}"
                     
@@ -51,28 +53,6 @@ pipeline {
             }
         }
         
-        stage('Update GitOps') {
-            steps {
-                script {
-                    def imageTag = "${env.BUILD_NUMBER}-${env.GIT_COMMIT.take(7)}"
-                    
-                    // Clone GitOps repository
-                    sh """
-                        git clone https://github.com/${env.GITHUB_REPOSITORY_OWNER}/k8s-gitops-config.git
-                        cd k8s-gitops-config
-                        
-                        # Update deployment image
-                        sed -i 's|image: .*|image: ${IMAGE_NAME}:${imageTag}|' overlays/production/deployment.yaml
-                        
-                        git config user.name "Jenkins"
-                        git config user.email "jenkins@example.com"
-                        git add .
-                        git commit -m "Update image to ${imageTag}" || true
-                        git push https://${DOCKER_CREDENTIALS_USR}:${DOCKER_CREDENTIALS_PSW}@github.com/${env.GITHUB_REPOSITORY_OWNER}/k8s-gitops-config.git
-                    """
-                }
-            }
-        }
     }
     
     post {
